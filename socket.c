@@ -2,12 +2,56 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <getopt.h>
+#include <unistd.h>
+#include <stdlib.h>
+
+void print_usage() {
+    printf("\nUsage: socket -s <servername> -p <portnumber>\n\n");
+}
+
 
 int main(int argc, char *argv[])
 {
   int socket_desc;
   struct sockaddr_in server;
   char *message, server_reply[2000];
+  char *myserver="";
+
+    int option = 0;
+    int port=-1;
+    //printf("aantal argumenten: %d", argc);
+    //printf("\noption=%d\n", getopt(argc,argv,"s:p:"));
+
+    //Specifying the expected options
+    //The two options s and p expect a hostname resp. a number as argument
+    while ((option = getopt(argc, argv,"s:p:")) != -1)
+    {
+printf("\noption=%d\n",option);
+         switch (option)
+         {
+             case 's' :
+                    myserver = optarg;
+                    break;
+             case 'p' : 
+                    port = atoi(optarg);
+                    break;
+             default: print_usage();
+                    exit(EXIT_FAILURE);
+         }
+    }
+
+    if ( port == -1 || myserver == "")
+    {
+       print_usage();
+       exit(EXIT_FAILURE);
+    }
+
+    printf("The server used: (%s)", myserver);
+    printf("The server-port used: (%d)", port);
+
+
+
 
   // Create socket
   socket_desc = socket(AF_INET , SOCK_STREAM , 0);
